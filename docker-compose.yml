@@ -1,1 +1,44 @@
+version: '3'
 
+services:
+  database:
+    image: mysql
+    container_name: database
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: supersecret
+      MYSQL_DATABASE: testapp   
+    ports:
+      - 3306:3306
+    volumes:
+     - dockerAngularSpringDatabaseData:/var/lib/mysql
+    networks:
+     - backendNetwork
+    
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+     
+  angular:
+    build:
+      context: AngularDocker # Use an image built from the specified dockerfile in the `angular-11-social-login` directory.
+      dockerfile: Dockerfile
+      args:
+        API_BASE_URL: http://127.0.0.1:8080/
+    ports:
+      - "8081:80" # Map the exposed port 80 on the container to port 8081 on the host machine
+    restart: always
+    #depends_on:
+      #- app-server
+    networks:
+      - frontendNetwork
+
+
+volumes:
+  dockerAngularSpringDatabaseData:
+  
+networks:
+  backendNetwork:
+  frontendNetwork:
